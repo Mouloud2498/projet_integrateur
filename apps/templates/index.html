@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BooksMatch — Bibliothèque Numérique</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+
+<body>
+  <div class="app-shell">
+
+    <!-- NAVBAR -->
+    <nav class="main-nav-modern">
+      <div class="container app-container">
+        <div class="nav-modern-inner">
+
+          <!-- Logo -->
+          <div class="nav-logo-wrap">
+            <img src="/static/logo.jpg" alt="BooksMatch" class="nav-logo-img" />
+            <span class="nav-logo-text">Books<span>Match</span></span>
+          </div>
+
+          <!-- Liens navigation -->
+          <div class="nav-left-group">
+            <a href="#" class="nav-modern-link active" data-section="accueil"
+              onclick="showSection('accueil');return false;">
+              <i class="bi bi-house-door-fill"></i><span>Accueil</span>
+            </a>
+            <a href="#" class="nav-modern-link" data-section="catalogue"
+              onclick="showSection('catalogue');return false;">
+              <i class="bi bi-grid-3x3-gap-fill"></i><span>Catalogue</span>
+            </a>
+            <a href="#" class="nav-modern-link" data-section="onboarding"
+              onclick="showSection('onboarding');return false;">
+              <i class="bi bi-stars"></i><span>Mes préférences</span>
+            </a>
+          </div>
+
+          <!-- Droite : recherche + liens utilitaires + login -->
+          <div class="nav-right-group">
+            <div class="search-modern">
+              <i class="bi bi-search"></i>
+              <input type="text" id="search-input" placeholder="Rechercher un livre, un auteur..."
+                onkeydown="handleSearch(event)" />
+              <button type="button" onclick="doSearch()">Chercher</button>
+            </div>
+
+            <div class="nav-util-links">
+              <a href="#" class="nav-util-link" onclick="openHelp();return false;">
+                <i class="bi bi-question-circle"></i> Aide
+              </a>
+              <a href="#" class="nav-util-link">Français</a>
+            </div>
+
+            <div class="login-modern" id="user-login-bar">
+              <div class="login-icon"><i class="bi bi-person-circle"></i></div>
+              <input type="number" id="user-id-input" placeholder="N° étudiant" min="1" />
+              <button type="button" onclick="loginUser()">Connexion</button>
+            </div>
+
+            <div id="user-badge" class="user-chip-modern" style="display:none;">
+              <div class="user-chip-icon"><i class="bi bi-person-fill"></i></div>
+              <div class="user-chip-content">
+                <span class="badge-name" id="badge-uid">—</span>
+                <span class="badge-seg" id="badge-seg"></span>
+              </div>
+              <button class="btn-books-lus" onclick="openLikedBooks()" title="Mes livres">
+                <i class="bi bi-book-half"></i>
+              </button>
+              <button class="btn-logout-modern" onclick="logoutUser()" title="Déconnexion">
+                <i class="bi bi-box-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </nav>
+
+    <!-- HERO HEADER -->
+    <section class="hero-header">
+      <div class="container app-container">
+        <div class="hero-grid">
+          <div class="hero-slideshow">
+            <div class="slideshow-track" id="slideshow-track"></div>
+            <div class="slideshow-dots" id="slideshow-dots"></div>
+            <button class="slide-arrow slide-prev" onclick="slidePrev()">
+              <i class="bi bi-chevron-left"></i>
+            </button>
+            <button class="slide-arrow slide-next" onclick="slideNext()">
+              <i class="bi bi-chevron-right"></i>
+            </button>
+          </div>
+
+          <!-- Droite : stats + features -->
+          <div class="hero-sidecard">
+            <div class="stats-panel">
+
+              <!-- Header -->
+              <div class="stats-panel-header">
+                <span class="stats-title">La bibliothèque</span>
+                <span class="stats-live"><i class="bi bi-activity"></i> Actif</span>
+              </div>
+
+              <!-- Chiffres clés côte à côte -->
+              <div class="stats-grid-h">
+                <div class="stat-pill">
+                  <i class="bi bi-book-half"></i>
+                  <div>
+                    <div class="stat-number" id="stat-books">—</div>
+                    <div class="stat-label">Livres</div>
+                  </div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-pill">
+                  <i class="bi bi-people-fill"></i>
+                  <div>
+                    <div class="stat-number" id="stat-users">—</div>
+                    <div class="stat-label">Lecteurs</div>
+                  </div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-pill">
+                  <i class="bi bi-star-fill"></i>
+                  <div>
+                    <div class="stat-number">3.9</div>
+                    <div class="stat-label">/ 5 moy.</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Genres -->
+              <div class="library-block">
+                <div class="library-block-title">
+                  <i class="bi bi-tags-fill"></i> Genres disponibles
+                </div>
+                <div class="genre-tags-wrap">
+                  <!-- généré dynamiquement -->
+                </div>
+              </div>
+
+              <!-- Barre satisfaction -->
+              <div class="satisfaction-compact">
+                <div class="satisfaction-compact-top">
+                  <span class="satisfaction-compact-label">
+                    <i class="bi bi-bar-chart-fill"></i> 196 296 évaluations
+                  </span>
+                  <span class="satisfaction-compact-pct">78% positives</span>
+                </div>
+                <div class="satisfaction-bar-wrap">
+                  <div class="satisfaction-bar-fill" style="width:78%"></div>
+                </div>
+              </div>
+
+              <!-- CTA -->
+              <button class="btn-hero-primary" onclick="showSection('onboarding')"
+                style="width:100%; justify-content:center;">
+                <i class="bi bi-stars"></i> Trouver mon prochain livre
+              </button>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+
+
+    <!-- CONTENU PRINCIPAL -->
+    <main class="main-content">
+      <div class="container app-container">
+
+        <!-- ========== ACCUEIL ========== -->
+        <section id="section-accueil">
+
+          <!-- Recommandations personnalisées -->
+          <section id="personal-section" class="feature-section" style="display:none;">
+            <div class="user-progress-banner" id="user-progress-banner">
+              <div class="upb-left">
+                <div class="upb-avatar"><i class="bi bi-person-fill"></i></div>
+                <div>
+                  <div class="upb-name" id="upb-name">—</div>
+                  <div class="upb-label" id="upb-label">0 livre évalué</div>
+                </div>
+              </div>
+              <div class="upb-center">
+                <div class="upb-progress-wrap">
+                  <div class="upb-progress-bar" id="upb-progress"></div>
+                </div>
+                <div class="upb-progress-text" id="upb-progress-text"></div>
+              </div>
+              <div class="upb-right">
+                <button class="btn-hero-secondary" onclick="openLikedBooks()">
+                  <i class="bi bi-book-half"></i> Mes livres lus
+                </button>
+              </div>
+            </div>
+            <div class="section-head-modern">
+              <div>
+                <span class="section-kicker">Recommandations personnalisées</span>
+                <h2 class="section-title-modern"><i class="bi bi-magic text-brand"></i> Pour vous</h2>
+                <p class="section-desc">Une sélection adaptée à votre historique et à votre profil de lecture.</p>
+              </div>
+              <div class="section-head-actions">
+                <div id="personal-strategy-badge"></div>
+                <button class="btn-soft-close" onclick="closePersonal()">
+                  <i class="bi bi-x-lg"></i> Fermer
+                </button>
+              </div>
+            </div>
+            <div id="personal-grid" class="book-grid-modern"></div>
+          </section>
+
+          <!-- Livres populaires -->
+          <section class="feature-section">
+            <div class="section-head-modern">
+              <div>
+                <span class="section-kicker">Découverte générale</span>
+                <h2 class="section-title-modern"><i class="bi bi-fire text-accent"></i> Tendances & livres populaires
+                </h2>
+                <p class="section-desc">Porte d'entrée idéale pour les nouveaux lecteurs et les explorateurs.</p>
+              </div>
+              <div class="section-actions-modern">
+                <select id="genre-filter-select" class="form-select modern-select" onchange="loadPopularByGenre()">
+                  <option value="">Tous les genres</option>
+                  <option value="fantasy">Fantasy</option>
+                  <option value="fiction">Fiction</option>
+                  <option value="romance">Romance</option>
+                  <option value="mystery">Policier</option>
+                  <option value="young-adult">Jeunesse</option>
+                  <option value="non-fiction">Non-fiction</option>
+                  <option value="history">Histoire</option>
+                  <option value="children">Enfants</option>
+                </select>
+                <a href="#" class="action-link-modern" onclick="showSection('catalogue');return false;">
+                  Parcourir le catalogue <i class="bi bi-arrow-right"></i>
+                </a>
+              </div>
+            </div>
+            <div id="popular-grid" class="book-grid-modern">
+              <div class="spinner-wrapper">
+                <div class="spinner-border"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Livres similaires -->
+          <section id="similar-section" class="feature-section" style="display:none;">
+            <div class="section-head-modern">
+              <div>
+                <span class="section-kicker">Similarité de contenu</span>
+                <h2 class="section-title-modern"><i class="bi bi-intersect text-brand"></i> Livres similaires</h2>
+                <p class="section-desc">Explorez des ouvrages proches d'un titre donné.</p>
+              </div>
+              <button class="btn-soft-close" onclick="hideSimilar()">
+                <i class="bi bi-x-lg"></i> Fermer
+              </button>
+            </div>
+            <div class="similar-source-modern" id="similar-source-label"></div>
+            <div id="similar-grid" class="book-grid-modern"></div>
+          </section>
+
+        </section>
+
+        <!-- ========== CATALOGUE ========== -->
+        <section id="section-catalogue" style="display:none;">
+          <section class="feature-section">
+            <div class="section-head-modern">
+              <div>
+                <span class="section-kicker">Exploration complète</span>
+                <h2 class="section-title-modern"><i class="bi bi-grid-3x3-gap-fill text-brand"></i> Catalogue</h2>
+                <p class="section-desc">Filtrez, triez et explorez tous les livres disponibles.</p>
+              </div>
+              <span class="catalogue-count-modern" id="catalogue-count"></span>
+            </div>
+            <div class="catalogue-toolbar">
+              <div class="catalogue-toolbar-grid">
+                <div class="catalogue-field">
+                  <label for="catalogue-search">Titre</label>
+                  <input type="text" class="form-control" id="catalogue-search" placeholder="Filtrer par titre..."
+                    oninput="filterCatalogue()" />
+                </div>
+                <div class="catalogue-field">
+                  <label for="catalogue-genre">Genre</label>
+                  <select class="form-select" id="catalogue-genre" onchange="filterCatalogue()">
+                    <option value="">Tous les genres</option>
+                  </select>
+                </div>
+                <div class="catalogue-field">
+                  <label for="catalogue-sort">Tri</label>
+                  <select class="form-select" id="catalogue-sort" onchange="filterCatalogue()">
+                    <option value="popularity">Popularité</option>
+                    <option value="rating">Mieux notés</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div id="catalogue-grid" class="book-grid-modern">
+              <div class="spinner-wrapper">
+                <div class="spinner-border"></div>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <!-- ========== ONBOARDING ========== -->
+        <section id="section-onboarding" style="display:none;">
+          <section class="feature-section">
+            <div class="section-head-modern">
+              <div>
+                <span class="section-kicker">Nouveau lecteur</span>
+                <h2 class="section-title-modern"><i class="bi bi-stars text-brand"></i> Construisez vos premières
+                  recommandations</h2>
+                <p class="section-desc">Sélectionnez au moins <strong>2 livres</strong> pour découvrir votre prochaine
+                  lecture idéale.
+                </p>
+              </div>
+            </div>
+
+            <div class="onboarding-panel">
+              <div class="onboarding-toolbar">
+                <div class="toolbar-copy">
+                  <h3>Quels livres vous ont marqué ?</h3>
+                  <p>Plus vous sélectionnez de livres, plus vos recommandations seront précises.</p>
+                </div>
+              </div>
+
+              <div class="genre-chip-wrap">
+                <span class="genre-chip selected" data-genre="" onclick="toggleGenreChip(this)"><i
+                    class="bi bi-grid"></i> Tous</span>
+                <span class="genre-chip" data-genre="fantasy" onclick="toggleGenreChip(this)"><i
+                    class="bi bi-stars"></i> Fantasy</span>
+                <span class="genre-chip" data-genre="fiction" onclick="toggleGenreChip(this)"><i class="bi bi-book"></i>
+                  Fiction</span>
+                <span class="genre-chip" data-genre="romance" onclick="toggleGenreChip(this)"><i
+                    class="bi bi-heart"></i> Romance</span>
+                <span class="genre-chip" data-genre="mystery" onclick="toggleGenreChip(this)"><i
+                    class="bi bi-search"></i> Policier</span>
+                <span class="genre-chip" data-genre="young-adult" onclick="toggleGenreChip(this)"><i
+                    class="bi bi-emoji-smile"></i> Jeunesse</span>
+                <span class="genre-chip" data-genre="non-fiction" onclick="toggleGenreChip(this)"><i
+                    class="bi bi-journal"></i> Non-fiction</span>
+              </div>
+
+              <div id="onboarding-grid" class="book-grid-modern mb-4">
+                <div class="spinner-wrapper">
+                  <div class="spinner-border"></div>
+                </div>
+              </div>
+
+              <div class="selection-footer">
+                <div class="selection-count" id="liked-count-label">0 livre sélectionné</div>
+                <button class="btn-hero-primary" id="btn-get-recos" onclick="getNewUserRecos()">
+                  <i class="bi bi-magic"></i> Obtenir mes recommandations
+                </button>
+              </div>
+            </div>
+
+            <div id="new-user-results" class="feature-section nested" style="display:none;">
+              <div class="section-head-modern">
+                <div>
+                  <span class="section-kicker">Résultat du démarrage</span>
+                  <h2 class="section-title-modern">Recommandations basées sur vos choix</h2>
+                </div>
+                <div class="section-head-actions">
+                  <span class="strategy-badge badge-content"><i class="bi bi-cpu"></i> Content-based</span>
+                  <button class="btn-soft-close" onclick="closeNewUserResults()">
+                    <i class="bi bi-x-lg"></i> Fermer
+                  </button>
+                </div>
+              </div>
+              <div id="new-user-grid" class="book-grid-modern"></div>
+            </div>
+
+          </section>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- MODAL LIVRE -->
+    <div class="modal fade" id="bookModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content modal-modern">
+
+          <div class="modal-header modal-header-modern">
+            <div class="modal-header-copy">
+              <span class="modal-kicker">Fiche livre</span>
+              <h5 class="modal-title"><i class="bi bi-book-half"></i> Détail du livre</h5>
+            </div>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body modal-body-modern">
+            <div class="book-modal-layout">
+              <div class="book-modal-cover-col">
+                <img id="modal-cover" src="" alt="" class="modal-cover-modern" />
+              </div>
+              <div class="book-modal-main">
+                <div class="book-modal-top">
+                  <span class="modal-genre-tag" id="modal-genre"></span>
+                  <h3 class="modal-book-title" id="modal-title"></h3>
+                  <div class="modal-author" id="modal-author"><i class="bi bi-person"></i> <span></span></div>
+                </div>
+                <div class="modal-stats-grid">
+                  <div class="modal-stat-card">
+                    <div class="modal-stat-icon"><i class="bi bi-star-fill"></i></div>
+                    <div>
+                      <div class="modal-stat-label">Évaluation</div>
+                      <div class="modal-stat-value">
+                        <span id="modal-rating"></span>
+                        <span id="modal-count" class="modal-stat-sub"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-stat-card" id="modal-pages-wrap">
+                    <div class="modal-stat-icon"><i class="bi bi-file-earmark-text"></i></div>
+                    <div>
+                      <div class="modal-stat-label">Longueur</div>
+                      <div class="modal-stat-value"><span id="modal-pages"></span> pages</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-description-block">
+                  <h4>Description</h4>
+                  <p id="modal-desc" class="description-text"></p>
+                </div>
+                <div class="modal-actions-row">
+                  <button class="btn-hero-primary" onclick="loadSimilar(currentBookId, currentBookTitle)">
+                    <i class="bi bi-intersect"></i> Voir les livres similaires
+                  </button>
+                  <button class="btn-hero-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Fermer
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <!-- MODAL LIVRES LUS -->
+    <div class="modal fade" id="likedBooksModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content modal-modern">
+          <div class="modal-header modal-header-modern">
+            <div class="modal-header-copy">
+              <span class="modal-kicker">Historique</span>
+              <h5 class="modal-title"><i class="bi bi-book-half"></i> Livres que vous avez aimés</h5>
+            </div>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body" style="padding: 20px; background: var(--surface-soft);">
+            <div id="liked-books-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ZONE TOASTS -->
+    <div class="toast-zone" id="toast-zone"></div>
+
+    <!-- FOOTER -->
+    <footer class="footer-modern">
+      <div class="container app-container">
+        <div class="footer-grid">
+
+          <!-- Colonne marque -->
+          <div class="footer-brand-col">
+            <div class="footer-brand">
+              <img src="/static/logo.jpg" alt="BooksMatch" class="footer-logo" />
+              <span class="footer-brand-name">Books<span>Match</span></span>
+            </div>
+            <p class="footer-tagline">
+              Système intelligent de recommandation de livres — Collège La Cité, Ottawa.
+            </p>
+            <div class="footer-socials">
+              <a href="#" class="footer-social" title="Facebook"><i class="bi bi-facebook"></i></a>
+              <a href="#" class="footer-social" title="Instagram"><i class="bi bi-instagram"></i></a>
+              <a href="#" class="footer-social" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
+              <a href="#" class="footer-social" title="GitHub"><i class="bi bi-github"></i></a>
+            </div>
+          </div>
+
+          <!-- Colonne entreprise -->
+          <div class="footer-links-col">
+            <div class="footer-col-title">Entreprise</div>
+            <ul class="footer-links">
+              <li><a href="#">À propos</a></li>
+              <li><a href="#">Carrières</a></li>
+              <li><a href="#">Conditions d'utilisation</a></li>
+              <li><a href="#">Confidentialité</a></li>
+              <li><a href="#">Préférences publicitaires</a></li>
+            </ul>
+          </div>
+
+          <!-- Colonne aide -->
+          <div class="footer-links-col">
+            <div class="footer-col-title">Aide</div>
+            <ul class="footer-links">
+              <li><a href="#">Centre d'aide</a></li>
+              <li><a href="#">Travailler avec nous</a></li>
+              <li><a href="#">Pour les auteurs</a></li>
+              <li><a href="#">Annonceurs</a></li>
+              <li><a href="#">Blog auteurs & annonces</a></li>
+            </ul>
+          </div>
+
+          <!-- Colonne app -->
+          <div class="footer-links-col">
+            <div class="footer-col-title">Version mobile</div>
+            <div class="footer-app-badges">
+              <a href="#" class="footer-app-badge">
+                <i class="bi bi-apple"></i>
+                <div>
+                  <div class="badge-sub">Télécharger sur</div>
+                  <div class="badge-main">App Store</div>
+                </div>
+              </a>
+              <a href="#" class="footer-app-badge">
+                <i class="bi bi-google-play"></i>
+                <div>
+                  <div class="badge-sub">Disponible sur</div>
+                  <div class="badge-main">Google Play</div>
+                </div>
+              </a>
+            </div>
+            <div class="footer-col-title" style="margin-top:18px;">IFM30542-H2026</div>
+            <ul class="footer-links">
+              <li><a href="#">Groupe 7</a></li>
+              <li><a href="#">Collège La Cité</a></li>
+            </ul>
+          </div>
+
+        </div>
+
+        <!-- Bas du footer -->
+        <div class="footer-bottom">
+          <span>© 2026 BooksMatch — Collège La Cité. Tous droits réservés.</span>
+          <div class="footer-bottom-links">
+            <a href="#">Confidentialité</a>
+            <a href="#">Conditions</a>
+            <a href="#">Aide</a>
+          </div>
+        </div>
+
+      </div>
+    </footer>
+
+    <!-- MODAL AIDE -->
+    <div class="modal fade" id="helpModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content modal-modern">
+
+          <div class="modal-header modal-header-modern">
+            <div class="modal-header-copy">
+              <span class="modal-kicker">Guide d'utilisation</span>
+              <h5 class="modal-title"><i class="bi bi-question-circle"></i> Comment utiliser BooksMatch ?</h5>
+            </div>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body" style="background:var(--surface-soft); padding:0;">
+
+            <!-- Tabs scénarios -->
+            <div class="help-tabs">
+              <button class="help-tab active" onclick="switchHelp(this,'help-welcome')">
+                <i class="bi bi-stars"></i> Démarrage rapide
+              </button>
+              <button class="help-tab" onclick="switchHelp(this,'help-s1')">
+                <i class="bi bi-person-fill"></i> Utilisateur connu
+              </button>
+              <button class="help-tab" onclick="switchHelp(this,'help-s2')">
+                <i class="bi bi-heart-fill"></i> Nouveau lecteur
+              </button>
+              <button class="help-tab" onclick="switchHelp(this,'help-s3')">
+                <i class="bi bi-intersect"></i> Livres similaires
+              </button>
+              <button class="help-tab" onclick="switchHelp(this,'help-s4')">
+                <i class="bi bi-grid-3x3-gap-fill"></i> Catalogue
+              </button>
+              <button class="help-tab" onclick="switchHelp(this,'help-contact')">
+                <i class="bi bi-envelope-fill"></i> Poser une question
+              </button>
+            </div>
+
+            <div class="help-content">
+
+              <!-- DÉMARRAGE RAPIDE -->
+              <div id="help-welcome" class="help-panel active">
+                <div class="help-welcome-grid">
+                  <div class="help-welcome-text">
+                    <div class="help-welcome-badge">
+                      <i class="bi bi-stars"></i> Bienvenue sur BooksMatch
+                    </div>
+                    <h2 class="help-welcome-title">Trouvez votre prochaine lecture en 30 secondes</h2>
+                    <p class="help-welcome-desc">
+                      BooksMatch est un système intelligent qui analyse vos goûts de lecture pour vous proposer des
+                      livres personnalisés. Choisissez votre scénario ci-dessous.
+                    </p>
+                    <div class="help-scenarios-quick">
+                      <div class="help-scenario-card" onclick="switchHelpById('help-s1')">
+                        <div class="hsc-icon"><i class="bi bi-person-fill"></i></div>
+                        <div>
+                          <div class="hsc-title">J'ai un compte</div>
+                          <div class="hsc-desc">Je me connecte avec mon numéro étudiant</div>
+                        </div>
+                        <i class="bi bi-chevron-right hsc-arrow"></i>
+                      </div>
+                      <div class="help-scenario-card" onclick="switchHelpById('help-s2')">
+                        <div class="hsc-icon accent"><i class="bi bi-heart-fill"></i></div>
+                        <div>
+                          <div class="hsc-title">Je suis nouveau</div>
+                          <div class="hsc-desc">Je sélectionne des livres que j'aime</div>
+                        </div>
+                        <i class="bi bi-chevron-right hsc-arrow"></i>
+                      </div>
+                      <div class="help-scenario-card" onclick="switchHelpById('help-s3')">
+                        <div class="hsc-icon green"><i class="bi bi-intersect"></i></div>
+                        <div>
+                          <div class="hsc-title">J'ai un livre en tête</div>
+                          <div class="hsc-desc">Je cherche des livres similaires</div>
+                        </div>
+                        <i class="bi bi-chevron-right hsc-arrow"></i>
+                      </div>
+                      <div class="help-scenario-card" onclick="switchHelpById('help-s4')">
+                        <div class="hsc-icon purple"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+                        <div>
+                          <div class="hsc-title">J'explore</div>
+                          <div class="hsc-desc">Je parcours le catalogue par genre</div>
+                        </div>
+                        <i class="bi bi-chevron-right hsc-arrow"></i>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="help-welcome-visual">
+                    <div class="help-visual-quotes">
+                      <div class="help-quote">
+                        <i class="bi bi-quote"></i>
+                        <p>BooksMatch m'a fait découvrir des auteurs que je n'aurais jamais trouvés seul.</p>
+                        <span>— Utilisateur actif</span>
+                      </div>
+                      <div class="help-quote accent">
+                        <i class="bi bi-quote"></i>
+                        <p>En 2 minutes, j'avais une liste de 10 livres parfaits pour moi.</p>
+                        <span>— Nouveau lecteur</span>
+                      </div>
+                      <div class="help-quote green">
+                        <i class="bi bi-quote"></i>
+                        <p>Le filtre par genre est exactement ce dont j'avais besoin.</p>
+                        <span>— Explorateur</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SCÉNARIO 1 -->
+              <div id="help-s1" class="help-panel">
+                <div class="help-scenario-header">
+                  <div class="help-scenario-icon"><i class="bi bi-person-fill"></i></div>
+                  <div>
+                    <div class="help-scenario-kicker">Scénario 1</div>
+                    <h3 class="help-scenario-title">Obtenir des recommandations personnalisées</h3>
+                    <p class="help-scenario-desc">Vous avez déjà lu des livres ? Connectez-vous et BooksMatch vous
+                      propose une sélection de 10 livres faite spécialement pour vous, basée sur vos goûts et votre
+                      historique de lecture.</p>
+                  </div>
+                </div>
+                <div class="help-steps">
+                  <div class="help-step">
+                    <div class="help-step-num">1</div>
+                    <div class="help-step-body">
+                      <div class="help-step-title">Entrez votre numéro étudiant</div>
+                      <div class="help-step-desc">Dans la barre de navigation, saisissez votre numéro étudiant dans le
+                        champ "N° étudiant" et appuyez sur <strong>Connexion</strong>.</div>
+                      <div class="help-step-demo">
+                        <div class="demo-navbar">
+                          <div class="demo-input"><i class="bi bi-person-circle"></i> N° étudiant</div>
+                          <div class="demo-btn">Connexion</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="help-step">
+                    <div class="help-step-num">2</div>
+                    <div class="help-step-body">
+                      <div class="help-step-title">Consultez votre profil</div>
+                      <div class="help-step-desc">Une bannière apparaît avec votre progression. Votre segment est
+                        affiché : <span class="demo-badge cold">Découvreur</span> <span
+                          class="demo-badge warm">Lecteur</span> ou
+                        <span class="demo-badge actif">Passionné</span> selon votre nombre d'interactions.
+                      </div>
+                    </div>
+                  </div>
+                  <div class="help-step">
+                    <div class="help-step-num">3</div>
+                    <div class="help-step-body">
+                      <div class="help-step-title">Parcourez vos recommandations</div>
+                      <div class="help-step-desc">La section <strong>"Pour vous"</strong> affiche 10 livres avec un
+                        score de pertinence [0–1] et une raison personnalisée pour chaque recommandation.</div>
+                      <div class="help-tip">
+                        <i class="bi bi-lightbulb-fill"></i>
+                        <span>Plus vous lisez et évaluez des livres, plus vos recommandations s'affinent et
+                          correspondent à vos vraies envies.</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="help-step">
+                    <div class="help-step-num">4</div>
+                    <div class="help-step-body">
+                      <div class="help-step-title">Consultez vos livres lus</div>
+                      <div class="help-step-desc">
+                        En un clic, BooksMatch analyse vos choix et vous propose <strong>10 livres qui vous
+                          ressemblent</strong> — avec une explication personnalisée pour chacun.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SCÉNARIO 2 -->
+              <!-- SCÉNARIO 2 -->
+              <div id="help-s2" class="help-panel">
+                <div class="help-scenario-header">
+                  <div class="help-scenario-icon accent"><i class="bi bi-heart-fill"></i></div>
+                  <div>
+                    <div class="help-scenario-kicker">Scénario 2</div>
+                    <h3 class="help-scenario-title">Démarrer sans compte — Nouveau lecteur</h3>
+                    <p class="help-scenario-desc">Pas de compte ? Sélectionnez des livres que vous aimez et BooksMatch
+                      génère des recommandations basées sur vos goûts en quelques secondes.</p>
+                  </div>
+                </div>
+                <div class="help-steps">
+                  <div class="help-step">
+                    <div class="help-step-num">1</div>
+                    <div class="help-step-body">
+                      <div class="help-step-title">Cliquez sur "Mes préférences"</div>
+                      <div class="help-step-desc">Dans la navbar, cliquez sur <strong><i class="bi bi-stars"></i> Mes
+                          préférences</strong> pour accéder à la page d'onboarding.</div>
+                    </div>
+                  </div>
+                  <div class="help-step">
+                    <div class="help-step-num">2</div>
+                    <div class="help-step-body">
+                      <div class="help-step-title">Filtrez par genre (optionnel)</div>
+                      <div class="help-step-desc">Utilisez les chips de genre pour afficher uniquement les livres d'un
+                        genre qui vous intéresse : Fantasy, Romance, Comics, etc.</div>
+                      <div class="help-step-demo">
+                        <div class="demo-chips">
+                          <span class="demo-chip selected">Tous</span>
+                          <span class="demo-chip">Fantasy</span>
+                          <span class="demo-chip">Romance</span>
+                          <span class="demo-chip">Comics</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="help-step">
+                    <div class="help-step-num">3</div>
+                    <div class="help-step-body">
+                      <div class="help-step-title">Sélectionnez au moins 2 livres</div>
+                      <div class="help-step-desc">Cliquez sur les livres que vous avez lus ou appréciés. Une coche bleue
+                        confirme la sélection. Le compteur en bas se met à jour automatiquement.</div>
+                      <div class="help-tip">
+                        <i class="bi bi-lightbulb-fill"></i>
+                        <span>Plus vous sélectionnez de livres de genres variés, plus vos recommandations seront
+                          diversifiées.</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="help-step">
+                    <div class="help-step-num">4</div>
+                    <div class="help-step-body">
+                      <div class="help-step-title">Cliquez sur "Obtenir mes recommandations"</div>
+                      <div class="help-step-desc">En un clic, BooksMatch vous propose <strong>10 livres qui vous
+                          ressemblent</strong> — avec une explication personnalisée pour chacun.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SCÉNARIO 3 -->
+              <div id="help-s3" class="help-panel">
+                <div class="help-scenario-header">
+                  <div class="help-scenario-icon green"><i class="bi bi-intersect"></i></div>
+                  <div>
+                    <div class="help-scenario-kicker">Scénario 3</div>
+                    <h3 class="help-scenario-title">Trouver des livres similaires à un titre</h3>
+                    <p class="help-scenario-desc">Vous avez aimé un livre et voulez en lire d'autres dans le même
+                      univers. Le moteur de similarité cosinus sur embeddings Jina v4 trouve les 8 plus proches.</p>
+                  </div>
+                </div>
+                <div class="help-steps">
+                  <div class="help-step">
+                    <div class="help-step-num">1</div>
+                    <div class="help-step-body">
+                      <div class="help-step-title">Trouvez le livre dans le catalogue ou les populaires</div>
+                      <div class="help-step-desc">Naviguez dans <strong>Accueil → Populaires</strong> ou allez dans le
+                        <strong>Catalogue</strong> et recherchez le titre ou l'auteur.
+                      </div>
+                    </div>
+                  </div>
+                  <div class="help-step">
+                    <div class="help-step-num">2</div>
+                    <div class="help-step-body">
+                      <div class="help-step-title">Cliquez sur la carte du livre</div>
+                      <div class="help-step-desc">Un modal s'ouvre avec la fiche complète : genre, note, nombre
+                        d'évaluations, pages et description.</div>
+                    </div>
+                  </div>
+                  <div class="help-step">
+                    <div class="help-step-num">3</div>
+                    <div class="help-step-body">
+                      <div class="help-step-title">Cliquez sur "Voir les livres similaires"</div>
+                      <div class="help-step-desc">Le modal se ferme et la section <strong>Livres similaires</strong>
+                        apparaît avec 8 titres classés par score de similarité cosinus.</div>
+                      <div class="help-tip">
+                        <i class="bi bi-info-circle-fill"></i>
+                        <span>Score ≥ 0.90 = même série ou même auteur. Score ≥ 0.85 = même genre. Score ≥ 0.80 = genre
+                          voisin.</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SCÉNARIO 4 -->
+              <div id="help-s4" class="help-panel">
+                <div class="help-scenario-header">
+                  <div class="help-scenario-icon purple"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+                  <div>
+                    <div class="help-scenario-kicker">Scénario 4</div>
+                    <h3 class="help-scenario-title">Explorer le catalogue</h3>
+                    <p class="help-scenario-desc">Parcourez les 898 livres disponibles, filtrez par genre, triez par
+                      popularité ou par note.</p>
+                  </div>
+                </div>
+                <div class="help-steps">
+                  <div class="help-step">
+                    <div class="help-step-num">1</div>
+                    <div class="help-step-body">
+                      <div class="help-step-title">Ouvrez le catalogue</div>
+                      <div class="help-step-desc">Cliquez sur <strong><i class="bi bi-grid-3x3-gap-fill"></i>
+                          Catalogue</strong> dans la navbar ou sur "Explorer le catalogue" depuis l'accueil.</div>
+                    </div>
+                  </div>
+                  <div class="help-step">
+                    <div class="help-step-num">2</div>
+                    <div class="help-step-body">
+                      <div class="help-step-title">Filtrez par genre</div>
+                      <div class="help-step-desc">Utilisez le menu déroulant <strong>Genre</strong> pour afficher
+                        uniquement les livres d'un genre primaire. Vous pouvez aussi cliquer sur un tag genre depuis
+                        l'accueil.</div>
+                      <div class="help-step-demo">
+                        <div class="demo-toolbar">
+                          <div class="demo-field">
+                            <small>Titre</small>
+                            <div class="demo-input-field">Filtrer par titre...</div>
+                          </div>
+                          <div class="demo-field">
+                            <small>Genre</small>
+                            <div class="demo-input-field demo-select">Fantasy ▾</div>
+                          </div>
+                          <div class="demo-field">
+                            <small>Tri</small>
+                            <div class="demo-input-field demo-select">Popularité ▾</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="help-step">
+                    <div class="help-step-num">3</div>
+                    <div class="help-step-body">
+                      <div class="help-step-title">Recherchez par titre ou auteur</div>
+                      <div class="help-step-desc">La barre de recherche dans la navbar ou le champ "Titre" du catalogue
+                        permet de rechercher par titre <strong>et</strong> par nom d'auteur simultanément.</div>
+                      <div class="help-tip">
+                        <i class="bi bi-lightbulb-fill"></i>
+                        <span>Essayez de taper "Rowling" ou "Sanderson" pour voir tous les livres d'un auteur.</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- CONTACT -->
+              <div id="help-contact" class="help-panel">
+                <div class="help-scenario-header">
+                  <div class="help-scenario-icon accent"><i class="bi bi-envelope-fill"></i></div>
+                  <div>
+                    <div class="help-scenario-kicker">Support</div>
+                    <h3 class="help-scenario-title">Poser une question</h3>
+                    <p class="help-scenario-desc">Une question sur le système ? Remplissez ce formulaire et nous vous
+                      répondrons par email.</p>
+                  </div>
+                </div>
+
+                <div class="contact-form-wrap">
+                  <div id="contact-success" class="contact-success" style="display:none;">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <div>
+                      <div class="contact-success-title">Message envoyé !</div>
+                      <div class="contact-success-desc">Nous avons bien reçu votre question. Vous recevrez une réponse
+                        sous 48h.</div>
+                    </div>
+                  </div>
+
+                  <div id="contact-form-body">
+                    <div class="contact-field">
+                      <label>Votre nom</label>
+                      <input type="text" id="contact-name" placeholder="Ex : Marie Dupont" class="contact-input" />
+                    </div>
+                    <div class="contact-field">
+                      <label>Votre adresse email</label>
+                      <input type="email" id="contact-email" placeholder="votre@email.com" class="contact-input" />
+                    </div>
+                    <div class="contact-field">
+                      <label>Sujet</label>
+                      <select id="contact-subject" class="contact-input">
+                        <option value="">Sélectionner un sujet...</option>
+                        <option value="Problème de connexion">Problème de connexion</option>
+                        <option value="Recommandations incorrectes">Recommandations incorrectes</option>
+                        <option value="Livre manquant dans le catalogue">Livre manquant dans le catalogue</option>
+                        <option value="Bug ou erreur technique">Bug ou erreur technique</option>
+                        <option value="Suggestion d'amélioration">Suggestion d'amélioration</option>
+                        <option value="Autre question">Autre question</option>
+                      </select>
+                    </div>
+                    <div class="contact-field">
+                      <label>Votre message</label>
+                      <textarea id="contact-message" class="contact-input contact-textarea"
+                        placeholder="Décrivez votre question en détail..."></textarea>
+                    </div>
+                    <div class="contact-footer">
+                      <span class="contact-note"><i class="bi bi-shield-check"></i> Vos données sont utilisées
+                        uniquement pour vous répondre.</span>
+                      <button class="btn-hero-primary" onclick="sendContactForm()">
+                        <i class="bi bi-send-fill"></i> Envoyer le message
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/script.js"></script>
+</body>
+
+</html>
