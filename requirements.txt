@@ -1,0 +1,21 @@
+# ─── Web Framework ───────────────────────────────────────────
+flask==3.0.3
+flask-cors==4.0.1
+
+# ─── Data Science ────────────────────────────────────────────
+numpy==1.26.4
+pandas==2.2.2
+scikit-learn==1.4.2
+scipy==1.13.0
+
+# ─── Recommandation collaborative ────────────────────────────
+scikit-surprise==1.1.4
+
+# ─── Embeddings / NLP ────────────────────────────────────────
+requests==2.31.0
+
+# ─── Interprétabilité ────────────────────────────────────────
+shap==0.45.1
+
+# ─── Utilitaires ─────────────────────────────────────────────
+python-dotenv==1.0.1
